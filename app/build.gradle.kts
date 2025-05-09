@@ -79,6 +79,9 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     annotationProcessor(libs.room.compiler)
+    implementation(libs.room.paging)
+    implementation(libs.room.rxjava2)
+    implementation(libs.room.rxjava3)
 
     // Dependency Injection
     implementation(libs.hilt.android)
