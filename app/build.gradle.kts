@@ -82,11 +82,14 @@ dependencies {
     implementation(libs.room.paging)
     implementation(libs.room.rxjava2)
     implementation(libs.room.rxjava3)
+    kapt ("androidx.room:room-compiler:2.5.2")
 
     // Dependency Injection
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+    implementation("javax.annotation:javax.annotation-api:1.3.2")
+    implementation ("androidx.annotation:annotation:1.7.1")
 
     // Navigation
     implementation(libs.navigation.compose)

@@ -1,11 +1,10 @@
 package com.example.transactionsapp.presentation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.transactionsapp.data.model.ReceiverSaleItem
 import com.example.transactionsapp.domain.usecase.InsertTransactionDetailsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -13,16 +12,23 @@ class MainViewModel @Inject constructor(
     private val insertTransactionDetailsUseCase: InsertTransactionDetailsUseCase,
 ):ViewModel() {
 
-    fun insertTransactionDetails(
+
+    suspend fun insertTransactionDetails(
         totalBasketAmount: Double,
         saleItems: List<ReceiverSaleItem>,
         paymentType: String
-    ) = viewModelScope.launch {
-        insertTransactionDetailsUseCase(
-            totalBasketAmount = totalBasketAmount,
-            saleItems = saleItems,
-            paymentType = paymentType
-        )
+    ):Result<Unit> {
+        return try {
+            Log.d("MainViewModel", "Inserting transaction details")
+            insertTransactionDetailsUseCase(
+                totalBasketAmount = totalBasketAmount,
+                saleItems = saleItems,
+                paymentType = paymentType
+            )
+        } catch (e: Exception) {
+            Log.e("MainViewModel", "Error inserting transaction details: ${e.message}")
+            Result.failure(e)
+        }
     }
 
 }
