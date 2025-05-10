@@ -8,7 +8,7 @@ import androidx.room.ForeignKey
 ])
 data class SaleItem(
     val receiptNumber:Int,
-    val id:String,
+    val id:Int,
     val label:String,
     val quantity:Int,
     val amount:Double,

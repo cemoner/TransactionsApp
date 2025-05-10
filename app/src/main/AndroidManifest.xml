@@ -13,7 +13,7 @@
         android:theme="@style/Theme.TransactionsApp"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".presentation.ui.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.TransactionsApp">
@@ -21,6 +21,11 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="ACTION_NEW_TRANSACTION" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/vnd.transaction" />
             </intent-filter>
         </activity>
     </application>
