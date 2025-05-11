@@ -20,7 +20,9 @@ interface TransactionDao {
     @Insert
     suspend fun insertSaleItem(saleItem: SaleItem): Long
 
-
+    // Deletions
+    @Query("DELETE FROM receipts WHERE receiptNumber = :receiptNumber")
+    suspend fun deleteReceiptByNumber(receiptNumber: Int)
 
     // Filtering
     @Query("SELECT * FROM receipts WHERE substr(receiptDateTime, 12, 2) = :hour AND totalAmount >= 0 AND paymentType != 'PLACEHOLDER' LIMIT 100")

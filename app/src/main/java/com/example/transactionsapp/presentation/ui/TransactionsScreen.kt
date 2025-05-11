@@ -2,6 +2,9 @@ package com.example.transactionsapp.presentation.ui
 
 import android.app.Activity
 import android.os.Build
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,6 +26,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,8 +36,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.transactionsapp.data.datasource.local.room.entity.Receipt
 import com.example.transactionsapp.presentation.viewmodel.TransactionsViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -52,16 +59,40 @@ fun TransactionsContent(
     val context = LocalContext.current
     val receipts by viewModel.receipts.collectAsStateWithLifecycle()
     val filterText = viewModel.filterText.collectAsStateWithLifecycle()
+    val selectedReceipt = remember { mutableStateOf<Receipt?>(null) }
 
     val rNoList = receipts.map { it.receiptNumber }
     val timeList = receipts.map { it.receiptDateTime.split(" ")[1] }
     val amountList = receipts.map { it.totalAmount }
 
+
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val resultMessage = result.data?.getIntExtra("RESPONSE_CODE", -1)
+        if(resultMessage == 0) {
+            val receipt = selectedReceipt.value
+            if (receipt != null) {
+                viewModel.deleteReceipt(receipt.receiptNumber)
+                Log.d("TransactionsScreen", "Receipt ${receipt.receiptNumber} deleted successfully.")
+            } else {
+                Log.e("TransactionsScreen", "Error: Receipt is null.")
+            }
+        }
+        else if(resultMessage == -1){
+            Log.d("TransactionsScreen", "Receipt deletion cancelled.")
+
+        }
+        else {
+            Log.e("TransactionsScreen", "Error: $resultMessage")
+        }
+    }
+
     Column(
         modifier = Modifier
             .padding(8.dp)
             .background(Color(0xFFADD8E6))
-            .fillMaxWidth(0.6f)
+            .fillMaxWidth(0.7f)
             .border(1.dp, Color.Black),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -96,7 +127,8 @@ fun TransactionsContent(
                 .padding(8.dp)
                 .background(Color.White, RoundedCornerShape(32.dp))
                 .fillMaxWidth()
-                .defaultMinSize(minHeight = 200.dp),
+                .defaultMinSize(minHeight = 200.dp)
+                    ,
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.Absolute.SpaceBetween
         ) {
@@ -152,6 +184,42 @@ fun TransactionsContent(
                         color = Color.Gray,
                         style = MaterialTheme.typography.bodySmall
                     )
+                }
+            }
+
+            Column(
+                modifier = Modifier.padding(end = 16.dp, top = 16.dp, bottom = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Cancel",
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                for(receipt in receipts){
+                    Button(
+                        onClick = {
+                            selectedReceipt.value = receipt
+                            val intent = viewModel.prepareIntent(receipt.totalAmount)
+                            launcher.launch(intent)
+                        },
+                        modifier = Modifier
+                            .height(16.5.dp)
+                            .padding(3.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF749E43),
+                            contentColor = Color.Black
+                        ),
+                        shape = RectangleShape,
+                        contentPadding = PaddingValues(
+                            start = 0.dp,
+                            top = 0.dp,
+                            end = 0.dp,
+                            bottom = 0.dp
+                        ),
+                    ) {
+                        Text("Cancel",fontSize = 9.sp)
+                    }
                 }
             }
         }

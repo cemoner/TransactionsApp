@@ -1,10 +1,13 @@
 package com.example.transactionsapp.presentation.viewmodel
 
+import android.content.ComponentName
+import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.transactionsapp.data.datasource.local.room.entity.Receipt
+import com.example.transactionsapp.domain.usecase.DeleteReceiptByReceiptNumber
 import com.example.transactionsapp.domain.usecase.GetFilteredReceiptsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class TransactionsViewModel @Inject constructor(
 
-    private val getFilteredReceiptsUseCase: GetFilteredReceiptsUseCase
+    private val getFilteredReceiptsUseCase: GetFilteredReceiptsUseCase,
+    private val deleteReceiptsByReceiptNumber: DeleteReceiptByReceiptNumber,
 ): ViewModel() {
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -52,7 +56,6 @@ class TransactionsViewModel @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun loadData(filter:String) = viewModelScope.launch {
-        //get the current hour
         _filterText.value = filter
         getFilteredReceiptsUseCase(
             filter = filter
@@ -61,4 +64,26 @@ class TransactionsViewModel @Inject constructor(
         }
     }
 
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun deleteReceipt(receiptNumber: Int) = viewModelScope.launch {
+        val result = deleteReceiptsByReceiptNumber(receiptNumber)
+        result.onSuccess {
+            loadData(filter)
+        }
+        result.onFailure {
+            loadData(filter)
+            // Handle error
+        }
+    }
+
+    fun prepareIntent(totalAmount: Double):Intent {
+        return Intent("ACTION_CONFIRM_OPERATION").apply {
+            component = ComponentName(
+                "com.example.mainapp",
+                "com.example.mainapp.presentation.ui.MainActivity"
+            )
+            putExtra("TOTAL_AMOUNT",totalAmount)
+        }
+    }
 }

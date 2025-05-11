@@ -194,11 +194,20 @@ class TransactionRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getSaleItemsByReceiptNumber(receiptNumber: Int): Flow<List<SaleItem>> {
+    override suspend fun getSaleItemsByReceiptNumber(receiptNumber: Int): Flow<List<SaleItem>> {
         return transactionDao.getSaleItemsByReceiptNumber(receiptNumber)
     }
 
-    override fun getAllSaleItems(): Flow<List<SaleItem>> {
+    override suspend fun getAllSaleItems(): Flow<List<SaleItem>> {
         return transactionDao.getAllSaleItems()
+    }
+
+    override suspend fun deleteReceiptByReceiptNumber(receiptNumber: Int): Result<Unit> {
+        return try {
+            transactionDao.deleteReceiptByNumber(receiptNumber)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
