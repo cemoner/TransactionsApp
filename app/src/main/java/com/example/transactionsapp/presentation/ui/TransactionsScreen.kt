@@ -1,5 +1,6 @@
 package com.example.transactionsapp.presentation.ui
 
+import android.app.Activity
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -47,6 +49,7 @@ fun TransactionsScreen(
 fun TransactionsContent(
     viewModel: TransactionsViewModel
 ) {
+    val context = LocalContext.current
     val receipts by viewModel.receipts.collectAsStateWithLifecycle()
     val filterText = viewModel.filterText.collectAsStateWithLifecycle()
 
@@ -103,7 +106,7 @@ fun TransactionsContent(
                 verticalArrangement = Arrangement.Top
             ) {
                 Text(
-                    text = "Rno",
+                    text = "RNo",
                     color = Color.Gray,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -136,7 +139,7 @@ fun TransactionsContent(
             }
             Column(
                 modifier = Modifier.padding(end = 16.dp, top = 16.dp, bottom = 16.dp),
-                horizontalAlignment = Alignment.Start
+                horizontalAlignment = Alignment.End
             ) {
                 Text(
                     text = "Amount",
@@ -156,7 +159,7 @@ fun TransactionsContent(
 
         Button(
             onClick = {
-
+                (context as? Activity)?.finish()
             },
             modifier = Modifier
                 .padding(8.dp)
