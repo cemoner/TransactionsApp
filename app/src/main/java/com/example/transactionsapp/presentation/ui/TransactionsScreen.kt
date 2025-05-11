@@ -50,6 +50,10 @@ fun TransactionsContent(
     val receipts by viewModel.receipts.collectAsStateWithLifecycle()
     val filterText = viewModel.filterText.collectAsStateWithLifecycle()
 
+    val rNoList = receipts.map { it.receiptNumber }
+    val timeList = receipts.map { it.receiptDateTime.split(" ")[1] }
+    val amountList = receipts.map { it.totalAmount }
+
     Column(
         modifier = Modifier
             .padding(8.dp)
@@ -81,57 +85,75 @@ fun TransactionsContent(
         )
         Spacer(
             modifier = Modifier
-                .height(8.dp))
-        Column(
+                .height(8.dp)
+        )
+
+        Row(
             modifier = Modifier
                 .padding(8.dp)
                 .background(Color.White, RoundedCornerShape(32.dp))
-                .defaultMinSize(minHeight = 256.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 200.dp),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.Absolute.SpaceBetween
         ) {
-            Row(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .background(Color.White).fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            Column(
+                modifier = Modifier.padding(start = 16.dp,top = 16.dp, bottom = 16.dp),
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Top
             ) {
                 Text(
                     text = "Rno",
-                    color = Color.LightGray,
+                    color = Color.Gray,
                     style = MaterialTheme.typography.bodySmall
                 )
-                Text("Time", color = Color.LightGray, style = MaterialTheme.typography.bodySmall)
-                Text("Amount", color = Color.LightGray, style = MaterialTheme.typography.bodySmall)
+                for(rno in rNoList){
+                    Text(
+                        text = rno.toString(),
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
             }
-            for (receipt in receipts) {
-                Row(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .background(Color.White)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
+            Column(
+                modifier = Modifier.padding(vertical = 16.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = "Time",
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                for(time in timeList){
                     Text(
-                        receipt.receiptNumber.toString(),
-                        color = Color.LightGray,
+                        text = time,
+                        color = Color.Gray,
                         style = MaterialTheme.typography.bodySmall
                     )
+                }
+
+            }
+            Column(
+                modifier = Modifier.padding(end = 16.dp, top = 16.dp, bottom = 16.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = "Amount",
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                for(amount in amountList){
                     Text(
-                        receipt.receiptDateTime.split(" ")[1],
-                        color = Color.LightGray,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        receipt.totalAmount.toString(),
-                        color = Color.LightGray,
+                        text = amount.toString(),
+                        color = Color.Gray,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
         }
+
+
         Button(
             onClick = {
 

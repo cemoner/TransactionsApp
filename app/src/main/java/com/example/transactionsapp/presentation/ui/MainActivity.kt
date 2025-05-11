@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -65,7 +64,6 @@ class MainActivity : ComponentActivity() {
                 val gson = Gson()
                 val type = object : TypeToken<List<ReceiverSaleItem>>() {}.type
                 val saleItems: List<ReceiverSaleItem> = gson.fromJson(saleItemsJson, type)
-                Log.d("MainActivity", "Sale items: $saleItems")
                 lifecycleScope.launch {
                     var result:Result<Unit> = Result.failure(Exception("No result"))
                     async {

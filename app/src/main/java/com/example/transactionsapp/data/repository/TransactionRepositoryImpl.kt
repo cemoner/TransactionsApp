@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onEach
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
@@ -28,23 +27,36 @@ class TransactionRepositoryImpl @Inject constructor(
     ): Result<Unit> {
         return try {
             val receiptTime = getCurrentDate()
-            Log.d("TransactionRepo", "Receipt time: $receiptTime")
             val totalVat = calculateVat(saleItems)
-            val receiptNumber = getUniqueReceiptNumber(System.currentTimeMillis())
-            Log.d("TransactionRepo", "Total VAT: $totalVat")
+            Log.d("SaleItem", "Sale items: $saleItems")
+            val nextReceiptNumber = transactionDao.getReceiptCount() + 1
+
+            if (nextReceiptNumber % 10 == 0) {
+
+                val placeholderReceipt = Receipt(
+                    receiptDateTime = receiptTime,
+                    totalAmount = -1.0,
+                    paymentType = "PLACEHOLDER",
+                    totalVat = 0.0
+                )
+                transactionDao.insertReceipt(placeholderReceipt)
+
+                Log.e("TransactionRepo", "Receipt number $nextReceiptNumber is a multiple of 10, transaction rejected")
+                return Result.failure(Exception("Receipt number is a multiple of 10"))
+            }
             val receipt = Receipt(
-                receiptNumber = receiptNumber,
                 receiptDateTime = receiptTime,
                 totalAmount = totalBasketAmount,
                 paymentType = paymentType,
                 totalVat = totalVat
             )
+
             Log.d("TransactionRepo", "Receipt: $receipt")
-            val responseCode = transactionDao.insertReceipt(receipt)
-            if (responseCode > 0) {
+            val receiptNumber = transactionDao.insertReceipt(receipt)
+            if (receiptNumber > 0) {
                 val saleItemList = saleItems.map { saleItem ->
                     SaleItem(
-                        receiptNumber = receiptNumber,
+                        receiptNumber = receiptNumber.toInt(),
                         productId = saleItem.id,
                         label = saleItem.label,
                         quantity = saleItem.quantity,
@@ -63,32 +75,6 @@ class TransactionRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
-
-    private suspend fun getUniqueReceiptNumber(timestamp: Long): Int {
-        var attempts = 0
-        var receiptNumber: Int
-
-        do {
-            val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
-
-            val dateFormat = SimpleDateFormat("yyyy/MM/dd HH", Locale.getDefault())
-            val hourStart = dateFormat.format(calendar.time) + ":00:00"
-            val hourEnd = dateFormat.format(calendar.time) + ":59:59"
-
-            // Base number + any retry attempts
-            receiptNumber =
-                transactionDao.countReceiptsInTimeRange(hourStart, hourEnd) + 1 + attempts
-
-            // Check if this number already exists
-            val exists = transactionDao.receiptNumberExists(receiptNumber)
-
-            if (exists) {
-                attempts++
-            }
-        } while (exists && attempts < 10) // Limit retries to avoid infinite loop
-
-        return receiptNumber
     }
 
 
