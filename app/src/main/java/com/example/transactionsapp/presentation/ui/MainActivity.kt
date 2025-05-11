@@ -78,14 +78,14 @@ class MainActivity : ComponentActivity() {
 
                     result.onSuccess {
                         val resultIntent = Intent().apply {
-                            putExtra("RESULT", "Transaction completed successfully")
+                            putExtra("RESULT", "0")
                         }
                         setResult(Activity.RESULT_OK, resultIntent)
                         finish()
                     }
                     result.onFailure {
                         val resultIntent = Intent().apply {
-                            putExtra("RESULT", "Transaction failed")
+                            putExtra("RESULT", "-1")
                         }
                         setResult(Activity.RESULT_CANCELED, resultIntent)
                         finish()
