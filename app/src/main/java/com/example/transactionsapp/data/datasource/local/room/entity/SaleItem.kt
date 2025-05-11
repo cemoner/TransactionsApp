@@ -13,9 +13,9 @@ import androidx.room.PrimaryKey
 )
 data class SaleItem(
     @PrimaryKey(autoGenerate = true)
-    val saleItemId: Int = 0,  // Auto-generated unique ID
+    val saleItemId: Int = 0,
     val receiptNumber: Int,
-    val productId: Int,  // Original product ID
+    val productId: Int,
     val label: String,
     val quantity: Int,
     val amount: Double

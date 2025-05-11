@@ -12,7 +12,6 @@ class MainViewModel @Inject constructor(
     private val insertTransactionDetailsUseCase: InsertTransactionDetailsUseCase,
 ):ViewModel() {
 
-
     suspend fun insertTransactionDetails(
         totalBasketAmount: Double,
         saleItems: List<ReceiverSaleItem>,
@@ -30,5 +29,4 @@ class MainViewModel @Inject constructor(
             Result.failure(e)
         }
     }
-
 }

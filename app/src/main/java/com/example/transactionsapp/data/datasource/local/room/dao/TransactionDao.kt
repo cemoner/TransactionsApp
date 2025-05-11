@@ -13,15 +13,16 @@ interface TransactionDao {
     @Query("SELECT COUNT(*) FROM receipts")
     suspend fun getReceiptCount(): Int
 
+    // Insertions
     @Insert
     suspend fun insertReceipt(receipt: Receipt): Long
 
     @Insert
     suspend fun insertSaleItem(saleItem: SaleItem): Long
 
-    @Query("SELECT COUNT(*) FROM receipts WHERE receiptDateTime BETWEEN :startTime AND :endTime")
-    suspend fun countReceiptsInTimeRange(startTime: String, endTime: String): Int
 
+
+    // Filtering
     @Query("SELECT * FROM receipts WHERE substr(receiptDateTime, 12, 2) = :hour AND totalAmount >= 0 AND paymentType != 'PLACEHOLDER' LIMIT 100")
     fun getReceiptsByHour(hour: String): Flow<List<Receipt>>
 
@@ -34,6 +35,12 @@ interface TransactionDao {
     @Query("SELECT * FROM receipts WHERE receiptNumber LIKE :pattern || '%' AND totalAmount >= 0 AND paymentType != 'PLACEHOLDER' LIMIT 10")
     fun getReceiptsByNumberPattern(pattern: String): Flow<List<Receipt>>
 
+
+    // Getting Sale Items
     @Query("SELECT * FROM sale_items WHERE receiptNumber = :receiptNumber")
     fun getSaleItemsByReceiptNumber(receiptNumber: Int): Flow<List<SaleItem>>
+
+    @Query("SELECT * FROM sale_items")
+    fun getAllSaleItems(): Flow<List<SaleItem>>
+
 }

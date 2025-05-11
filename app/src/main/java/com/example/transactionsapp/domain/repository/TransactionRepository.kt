@@ -15,9 +15,9 @@ interface TransactionRepository {
 
     suspend fun insertReceipt(receipt: Receipt): Result<Unit>
 
-    suspend fun insertSaleItem(saleItem: SaleItem): Result<Unit>
-
     suspend fun getFilteredReceipts(filter: String): Flow<List<Receipt>>
     
     fun getSaleItemsByReceiptNumber(receiptNumber: Int): Flow<List<SaleItem>>
+
+    fun getAllSaleItems(): Flow<List<SaleItem>>
 }

@@ -28,7 +28,6 @@ class TransactionRepositoryImpl @Inject constructor(
         return try {
             val receiptTime = getCurrentDate()
             val totalVat = calculateVat(saleItems)
-            Log.d("SaleItem", "Sale items: $saleItems")
             val nextReceiptNumber = transactionDao.getReceiptCount() + 1
 
             if (nextReceiptNumber % 10 == 0) {
@@ -66,10 +65,8 @@ class TransactionRepositoryImpl @Inject constructor(
                 for (saleItem in saleItemList) {
                     transactionDao.insertSaleItem(saleItem)
                 }
-                Log.d("TransactionRepo", "Inserted sale items: $saleItemList")
                 Result.success(Unit)
             } else {
-                Log.e("TransactionRepo", "Failed to insert receipt")
                 Result.failure(Exception("Failed to insert receipt"))
             }
         } catch (e: Exception) {
@@ -197,20 +194,11 @@ class TransactionRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertSaleItem(saleItem: SaleItem): Result<Unit> {
-        return try {
-            val insertedId = transactionDao.insertSaleItem(saleItem)
-            if (insertedId > 0) {
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("Failed to insert sale item"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
     override fun getSaleItemsByReceiptNumber(receiptNumber: Int): Flow<List<SaleItem>> {
         return transactionDao.getSaleItemsByReceiptNumber(receiptNumber)
+    }
+
+    override fun getAllSaleItems(): Flow<List<SaleItem>> {
+        return transactionDao.getAllSaleItems()
     }
 }
